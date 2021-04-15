@@ -1,15 +1,18 @@
 import React from "react";
 import styled from "styled-components";
-import Slide from "./Slide";
+import Slide, { displayBlockSize } from "./Slide";
 import { Nav } from "./Nav";
 import { ISlide } from "./../types";
 
 const StyledCarousel = styled.div`
   display: flex;
   align-items: center;
-  max-width: 1000px;
+  /* max-width: 1000px; */
   position: relative;
   margin: auto;
+  @media only screen and (max-width: 1000px) {
+    flex-direction: column;
+  }
 `;
 
 interface CarouselProps {
@@ -45,7 +48,7 @@ const Carousel: React.FC<CarouselProps> = ({
       ))}
       <Nav
         icon={"fa fa-arrow-right"}
-        disabled={activeSlide === slides.length - 1}
+        disabled={activeSlide === slides.length / displayBlockSize - 1}
         onClickNav={() => slide(1)}
       ></Nav>
     </StyledCarousel>

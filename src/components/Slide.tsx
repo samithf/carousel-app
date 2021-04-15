@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import styled from "styled-components";
 
 const StyledSlide = styled.div`
@@ -8,18 +8,19 @@ const StyledSlide = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    font-size: 1.2em;
+    font-size: 1em;
     color: #ffffff;
-    background-color: #000000;
+    /* background-color: #000000; */
+    font-weight: 600;
     padding: 0.5em 0;
     width: 100%;
     text-align: center;
   }
   img {
-    max-width: 800px;
+    max-width: 400px;
     height: auto;
     display: block;
-    border: 3px solid #000000;
+    border: 1px solid #000000;
   }
   -webkit-animation-name: fade;
   -webkit-animation-duration: 1.5s;
@@ -52,6 +53,8 @@ interface SlideProps {
   index: number;
 }
 
+export const displayBlockSize = 4;
+
 const Slide: React.FC<SlideProps> = ({
   title,
   images,
@@ -61,15 +64,36 @@ const Slide: React.FC<SlideProps> = ({
   const slideElRef = React.useRef<HTMLDivElement>(null);
   const imageUrl = images[Math.floor(Math.random() * 3)];
 
+  // 0 => [0, 1, 2, 3]
+  // 1 => [4, 5, 6, 7]
+  // and so on
+  const getFilledBlocks = (start: number, end: number) => {
+    const blocks: number[] = [];
+    for (let index = start; index <= end; index++) {
+      blocks.push(index);
+    }
+    return blocks;
+  };
+
+  const isSlideIndexWithinRange = useCallback(
+    (activeSlideIndex: number, slideIndex: number) => {
+      return getFilledBlocks(
+        activeSlideIndex * displayBlockSize,
+        activeSlideIndex * displayBlockSize + (displayBlockSize - 1)
+      ).includes(slideIndex);
+    },
+    []
+  );
+
   useEffect(() => {
     if (slideElRef.current) {
-      if (index === activeSlideIndex) {
+      if (isSlideIndexWithinRange(activeSlideIndex, index)) {
         slideElRef.current.style.display = "block";
       } else {
         slideElRef.current.style.display = "none";
       }
     }
-  }, [activeSlideIndex, slideElRef, index]);
+  }, [activeSlideIndex, slideElRef, index, isSlideIndexWithinRange]);
 
   return (
     <StyledSlide ref={slideElRef}>
@@ -78,5 +102,4 @@ const Slide: React.FC<SlideProps> = ({
     </StyledSlide>
   );
 };
-
 export default Slide;
